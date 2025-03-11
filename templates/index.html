@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predicción de Precios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/showdown@1.9.1/dist/showdown.min.js"></script>
+    <!-- Librería para convertir Markdown a HTML -->
+</head>
+
+<body class="bg-light">
+    <!-- Encabezado Atractivo de Marketing -->
+    <header class="bg-info text-white py-3 mb-5">
+        <div class="container text-center">
+            <h1>Grupo 1</h1>
+            <h2 class="display-4 font-weight-bold">SmartPrice - La Herramienta de Predicción de Precios</h2>
+            <p class="lead text-center" style="font-size: 1.5rem; color: #007bff; font-weight: 700;">
+                🍴 Predice precios y crea la receta perfecta para ahorrar en tus compras. ¡Toma decisiones inteligentes
+                y optimiza tu vida!
+            </p>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal -->
+    <div class="container mt-5">
+        <div class="card shadow-lg p-4">
+            <h2 class="text-center text-primary">📊 Predicción de Precios en Mercados Mayoristas</h2>
+
+            <!-- Mensajes de error o éxito -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show mt-3" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="http://localhost:5008/predict" class="mt-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label class="form-label">Año:</label>
+                        <input type="number" class="form-control" name="Año" id="anio" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Mes:</label>
+                        <input type="number" class="form-control" name="Mes" id="mes" required min="1" max="12">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Día:</label>
+                        <input type="number" class="form-control" name="Día" id="dia" required min="1" max="31">
+                    </div>
+
+                    <script>
+                        document.getElementById('mes').addEventListener('input', actualizarDias);
+                        document.getElementById('anio').addEventListener('input', actualizarDias);
+
+                        function actualizarDias() {
+                            const mes = parseInt(document.getElementById('mes').value, 10);
+                            const anio = parseInt(document.getElementById('anio').value, 10);
+                            const diaInput = document.getElementById('dia');
+
+                            let maxDias;
+                            if (mes === 2) {
+                                maxDias = (anio % 4 === 0 && (anio % 100 !== 0 || anio % 400 === 0)) ? 29 : 28;
+                            } else if ([4, 6, 9, 11].includes(mes)) {
+                                maxDias = 30;
+                            } else {
+                                maxDias = 31;
+                            }
+
+                            diaInput.max = maxDias;
+                            if (diaInput.value > maxDias) {
+                                diaInput.value = maxDias;
+                            }
+                        }
+                    </script>
+                </div>
+
+                <div class="row mt-3">
+                    <!DOCTYPE html>
+                    <html lang="es">
+
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Seleccionar Provincia y Cantón</title>
+                        <script>
+                            const cantonesPorProvincia = {
+                                "Tungurahua": ["Ambato"],
+                                "Azuay": ["Cuenca"],
+                                "Guayas": ["Guayaquil"],
+                                "Imbabura": ["Ibarra"],
+                                "Pichincha": ["Quito", "Mejía"],
+                                "Chimborazo": ["Riobamba"],
+                                "Los Ríos": ["Babahoyo"],
+                                "Carchi": ["Bolívar"],
+                                "Bolívar": ["Guaranda"],
+                                "Santa Elena": ["La Libertad "],
+                                "Cotopaxi": ["Latacunga"],
+                                "El Oro": ["Machala"]
+                            };
+
+                            function actualizarCantones() {
+                                const provinciaSeleccionada = document.getElementById("provincia").value;
+                                const cantonSelect = document.getElementById("canton");
+
+                                // Limpiar opciones anteriores
+                                cantonSelect.innerHTML = "<option value='' disabled selected>Seleccione un cantón</option>";
+
+                                if (provinciaSeleccionada in cantonesPorProvincia) {
+                                    cantonesPorProvincia[provinciaSeleccionada].forEach(canton => {
+                                        let opcion = document.createElement("option");
+                                        opcion.value = canton;
+                                        opcion.textContent = canton;
+                                        cantonSelect.appendChild(opcion);
+                                    });
+                                }
+                            }
+                        </script>
+                    </head>
+
+                    <body>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Provincia:</label>
+                            <select class="form-control" name="Provincia" id="provincia" required
+                                onchange="actualizarCantones()">
+                                <option value="" disabled selected>Seleccione una provincia</option>
+                                <option value="Tungurahua">Tungurahua</option>
+                                <option value="Azuay">Azuay</option>
+                                <option value="Guayas">Guayas</option>
+                                <option value="Imbabura">Imbabura</option>
+                                <option value="Pichincha">Pichincha</option>
+                                <option value="Chimborazo">Chimborazo</option>
+                                <option value="Los Ríos">Los Ríos</option>
+                                <option value="Carchi">Carchi</option>
+                                <option value="Bolívar">Bolívar</option>
+                                <option value="Santa Elena">Santa Elena</option>
+                                <option value="Cotopaxi">Cotopaxi</option>
+                                <option value="El Oro">El Oro</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Cantón:</label>
+                            <select class="form-control" name="Cantón" id="canton" required>
+                                <option value="" disabled selected>Seleccione un cantón</option>
+                            </select>
+                        </div>
+
+                    </body>
+
+                    </html>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Producto:</label>
+                        <input type="text" class="form-control" id="producto" name="Producto" list="productos" required>
+                        <datalist id="productos"></datalist>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Presentación:</label>
+                        <select class="form-control" id="presentacion" name="Pres." required>
+                            <option value="">Seleccione presentación</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Cantidad:</label>
+                        <input type="number" class="form-control" id="cantidad" name="Cant." required step="0.01"
+                            readonly>
+                    </div>
+                </div>
+
+                <script>
+                    const productos = {
+                        "Aguacate Fuerte": [
+                            { presentacion: "Cartón", cantidad: 22 },
+                            { presentacion: "Saco", cantidad: 120 },
+                            { presentacion: "Ciento", cantidad: 55 },
+                            { presentacion: "Malla", cantidad: 78 }
+                        ],
+                        "Ajo Bulbo Seco": [
+                            { presentacion: "Malla", cantidad: 22 },
+                            { presentacion: "Malla", cantidad: 44 },
+                            { presentacion: "Cartón", cantidad: 22 }
+                        ],
+                        "Arveja Tierna en Vaina-Quantum": [
+                            { presentacion: "Saco", cantidad: 60 },
+                            { presentacion: "Bulto", cantidad: 110 },
+                            { presentacion: "Malla", cantidad: 27 },
+                            { presentacion: "Saco", cantidad: 110 },
+                            { presentacion: "Saco", cantidad: 45 }
+                        ],
+                        "Babaco": [
+                            { presentacion: "Cartón", cantidad: 65 },
+                            { presentacion: "Cartón", cantidad: 75 }
+                        ],
+                        "Brócoli": [
+                            { presentacion: "Unidad", cantidad: 2 },
+                            { presentacion: "Saco", cantidad: 45 }
+                        ],
+                        "Cebolla Blanca en Rama": [
+                            { presentacion: "Atado", cantidad: 5 },
+                            { presentacion: "Atado", cantidad: 3 },
+                            { presentacion: "Atado", cantidad: 2.2 },
+                            { presentacion: "Atado", cantidad: 7.2 },
+                            { presentacion: "Carga", cantidad: 90 }
+                        ],
+                        "Cebolla Colorada Nacional Húmeda": [
+                            { presentacion: "Malla", cantidad: 100 },
+                            { presentacion: "Malla", cantidad: 88.5 }
+                        ],
+                        "Cebolla Colorada Nacional Seca": [
+                            { presentacion: "Malla", cantidad: 100 },
+                            { presentacion: "Quintal", cantidad: 100 },
+                            { presentacion: "Saco", cantidad: 99 },
+                            { presentacion: "Malla", cantidad: 30 }
+                        ],
+                        "Cebolla Colorada Peruana Seca": [
+                            { presentacion: "Malla", cantidad: 100 },
+                        ],
+                        "Cebolla Perla Nacional Seca": [
+                            { presentacion: "Malla", cantidad: 100 },
+                            { presentacion: "Quintal", cantidad: 100 },
+                            { presentacion: "Malla", cantidad: 30 }
+                        ],
+                        "Col": [
+                            { presentacion: "Bulto", cantidad: 110 },
+                            { presentacion: "Bulto", cantidad: 125 },
+                            { presentacion: "Malla", cantidad: 105 },
+                            { presentacion: "Saco", cantidad: 130 },
+                            { presentacion: "Unidad", cantidad: 10 },
+                            { presentacion: "Saco", cantidad: 45 },
+                            { presentacion: "Unidad", cantidad: 3 },
+                        ],
+                        "Fréjol en Vaina - Gema": [
+                            { presentacion: "Saco", cantidad: 95 },
+                            { presentacion: "Bulto", cantidad: 110 },
+                            { presentacion: "Saco", cantidad: 75 },
+                            { presentacion: "Saco", cantidad: 85 },
+                            { presentacion: "Saco", cantidad: 110 },
+                        ],
+                        "Fréjol Tierno en Vaina Canario": [
+                            { presentacion: "Saco", cantidad: 55 },
+                            { presentacion: "Saco", cantidad: 50 },
+                        ],
+                        "Fréjol Tierno en Vaina Cargabello": [
+                            { presentacion: "Saco", cantidad: 95 },
+                            { presentacion: "Bulto", cantidad: 110 },
+                            { presentacion: "Saco", cantidad: 110 },
+                            { presentacion: "Saco", cantidad: 45 },
+                            { presentacion: "Saco", cantidad: 85 },
+                        ],
+                        "Frutilla": [
+                            { presentacion: "Balde", cantidad: 30 },
+                            { presentacion: "Cartón", cantidad: 15 },
+                            { presentacion: "Balde", cantidad: 25 },
+                        ],
+                        "Granadilla": [
+                            { presentacion: "Cartón", cantidad: 30 },
+                            { presentacion: "Caja", cantidad: 15 },
+                            { presentacion: "Caja", cantidad: 20 }
+                        ],
+                        "Haba Tierna en Vaina": [
+                            { presentacion: "Saco", cantidad: 70 },
+                            { presentacion: "Saco", cantidad: 64 },
+                            { presentacion: "Saco", cantidad: 85 },
+                            { presentacion: "Saco", cantidad: 63 },
+                            { presentacion: "Saco", cantidad: 50 },
+                            { presentacion: "Saco", cantidad: 100 }
+                        ],
+                        "Lechuga": [
+                            { presentacion: "Cartón", cantidad: 43 },
+                            { presentacion: "Bulto", cantidad: 85 },
+                            { presentacion: "Bulto", cantidad: 60 },
+                            { presentacion: "Saco", cantidad: 95 },
+                            { presentacion: "Saco", cantidad: 50 },
+                            { presentacion: "Saco", cantidad: 45 },
+                            { presentacion: "Cartón", cantidad: 30 }
+                        ],
+                        "Limón Sutil": [
+                            { presentacion: "Malla", cantidad: 95 },
+                            { presentacion: "Saco", cantidad: 80 },
+                            { presentacion: "Malla", cantidad: 90 },
+                            { presentacion: "Saco", cantidad: 90 }
+                        ],
+                        "Maíz Suave Choclo": [
+                            { presentacion: "Saco", cantidad: 80 },
+                            { presentacion: "Saco", cantidad: 100 },
+                            { presentacion: "Saco", cantidad: 105 },
+                            { presentacion: "Saco", cantidad: 110 },
+                            { presentacion: "Saco", cantidad: 70 }
+                        ],
+                        "Mandarina de la Sierra": [
+                            { presentacion: "Saco", cantidad: 30 }
+                        ],
+                        "Maracuyá": [
+                            { presentacion: "Saco", cantidad: 40 },
+                            { presentacion: "Funda", cantidad: 35 },
+                            { presentacion: "Ciento", cantidad: 40 }
+                        ],
+                        "Melloco Blanco": [
+                            { presentacion: "Saco", cantidad: 100 }
+                        ],
+                        "Melloco Rojo": [
+                            { presentacion: "Saco", cantidad: 100 }
+                        ],
+                        "Melón": [
+                            { presentacion: "Cartón", cantidad: 55 },
+                            { presentacion: "Unidad", cantidad: 5 },
+                            { presentacion: "Cartón", cantidad: 60 },
+                            { presentacion: "Docena", cantidad: 65 }
+                        ],
+                        "Mora de Castilla": [
+                            { presentacion: "Balde", cantidad: 15 },
+                            { presentacion: "Caja", cantidad: 5 },
+                            { presentacion: "Libra", cantidad: 1 },
+                            { presentacion: "Balde", cantidad: 12 },
+                            { presentacion: "Balde", cantidad: 6 }
+                        ],
+                        "Naranjilla de Jugo": [
+                            { presentacion: "Caja", cantidad: 30 }
+                        ],
+                        "Naranjilla Híbrida": [
+                            { presentacion: "Caja", cantidad: 30 },
+                            { presentacion: "Saco", cantidad: 110 },
+                            { presentacion: "Saco", cantidad: 69 }
+                        ],
+                        "Naranjilla Roja Palora": [
+                            { presentacion: "Caja", cantidad: 30 }
+                        ],
+                        "Papa Gabriela": [
+                            { presentacion: "Quintal", cantidad: 100 }
+                        ],
+                        "Papa Puzda": [
+                            { presentacion: "Quintal", cantidad: 100 }
+                        ],
+                        "Papa Rosita": [
+                            { presentacion: "Quintal", cantidad: 100 }
+                        ],
+                        "Papa Superchola": [
+                            { presentacion: "Quintal", cantidad: 100 },
+                            { presentacion: "Saco", cantidad: 140 },
+                            { presentacion: "Saco", cantidad: 130 }
+                        ],
+                        "Papa Única": [
+                            { presentacion: "Quintal", cantidad: 100 }
+                        ],
+                        "Pepinillo Pepino": [
+                            { presentacion: "Saco", cantidad: 70 },
+                            { presentacion: "Saco", cantidad: 45 },
+                            { presentacion: "Saco", cantidad: 67 },
+                            { presentacion: "Docena", cantidad: 12 },
+                            { presentacion: "Caja", cantidad: 33 }
+                        ],
+                        "Pimiento": [
+                            { presentacion: "Saco", cantidad: 45 },
+                            { presentacion: "Saco", cantidad: 80 },
+                            { presentacion: "Saco", cantidad: 36 },
+                            { presentacion: "Saco", cantidad: 32.21 },
+                            { presentacion: "Saco", cantidad: 50 }
+                        ],
+                        "Remolacha": [
+                            { presentacion: "Saco", cantidad: 90 },
+                            { presentacion: "Saco", cantidad: 70 },
+                            { presentacion: "Saco", cantidad: 75 },
+                            { presentacion: "Saco", cantidad: 80 }
+                        ],
+                        "Tomate de Árbol": [
+                            { presentacion: "Cartón", cantidad: 22 },
+                            { presentacion: "Saco", cantidad: 85 },
+                            { presentacion: "Caja", cantidad: 22 },
+                            { presentacion: "Caja", cantidad: 40 }
+                        ],
+                        "Tomate Riñón de Invernadero": [
+                            { presentacion: "Cartón", cantidad: 55 },
+                            { presentacion: "Gaveta", cantidad: 40 },
+                            { presentacion: "Caja", cantidad: 40 },
+                            { presentacion: "Cartón", cantidad: 40 },
+                            { presentacion: "Cartón", cantidad: 50 }
+                        ],
+                        "Uva Rosada - Perú": [
+                            { presentacion: "Caja", cantidad: 22 },
+                            { presentacion: "Caja", cantidad: 17 }
+                        ],
+                        "Zanahoria Amarilla": [
+                            { presentacion: "Saco", cantidad: 60 },
+                            { presentacion: "Saco", cantidad: 100 },
+                            { presentacion: "Saco", cantidad: 70 },
+                            { presentacion: "Saco", cantidad: 90 },
+                            { presentacion: "Saco", cantidad: 130 }
+                        ],
+                        "Yuca": [
+                            { presentacion: "Funda", cantidad: 60 },
+                            { presentacion: "Funda", cantidad: 120 },
+                            { presentacion: "Saco", cantidad: 180 },
+                            { presentacion: "Saco", cantidad: 200 }
+                        ]
+                    };
+
+
+                    const productoInput = document.getElementById("producto");
+                    const productosLista = document.getElementById("productos");
+                    const presentacionSelect = document.getElementById("presentacion");
+                    const cantidadInput = document.getElementById("cantidad");
+
+                    // Llenar datalist de productos
+                    Object.keys(productos).forEach(producto => {
+                        const option = document.createElement("option");
+                        option.value = producto;
+                        productosLista.appendChild(option);
+                    });
+
+                    // Filtrar presentaciones según el producto seleccionado
+                    productoInput.addEventListener("input", function () {
+                        const productoSeleccionado = this.value;
+                        presentacionSelect.innerHTML = '<option value="">Seleccione presentación</option>';
+                        cantidadInput.value = "";
+
+                        if (productos[productoSeleccionado]) {
+                            productos[productoSeleccionado].forEach(item => {
+                                const option = document.createElement("option");
+                                option.value = item.presentacion;
+                                option.textContent = item.presentacion;
+                                presentacionSelect.appendChild(option);
+                            });
+                        }
+                    });
+
+                    // Asignar cantidad automáticamente según la presentación
+                    presentacionSelect.addEventListener("change", function () {
+                        const productoSeleccionado = productoInput.value;
+                        const presentacionSeleccionada = this.value;
+                        const item = productos[productoSeleccionado]?.find(p => p.presentacion === presentacionSeleccionada);
+
+                        cantidadInput.value = item ? item.cantidad : "";
+                    });
+                </script>
+                <div class="col-md-6">
+                    <label class="form-label">Unidad de Medida:</label>
+                    <input type="text" class="form-control" name="Unidad Medida" value="Libra" readonly>
+                </div>
+
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 mt-4">🔍 Predecir</button>
+        </form>
+    </div>
+    </div>
+
+    <div class="container mt-5">
+        <div class="card shadow-lg p-4">
+            <h2 class="text-center text-primary">🍲 Generar Receta Económica</h2>
+    
+            <!-- Botón para generar la receta -->
+            <button id="generar-receta-btn" class="btn btn-primary w-100 mt-4">Generar Receta</button>
+    
+            <!-- Receta generada -->
+            <div id="receta-result" class="mt-4" style="display:none;">
+                <h3 class="text-center">Receta Sugerida:</h3>
+                <div id="receta-text"></div>
+            </div>
+        </div>
+    
+        <!-- Div separado para el botón de generar imagen -->
+        <div class="card shadow-lg p-4 mt-4">
+            <h2 class="text-center text-primary">🖼️ Generar Imagen del Emplatado</h2>
+    
+            <!-- Botón siempre visible para generar la imagen -->
+            <button id="generar-imagen-btn" class="btn btn-success w-100 mt-4">Generar Imagen</button>
+    
+            <!-- Mensaje de advertencia si no se ha generado la receta -->
+            <div id="mensaje-advertencia" class="mt-3 text-danger" style="display:none;">
+                <strong>¡Por favor, genera primero la receta antes de generar la imagen!</strong>
+            </div>
+    
+            <!-- Imagen generada -->
+            <div id="imagen-generada" class="mt-4" style="display:none;">
+                <h3 class="text-center">Imagen Generada:</h3>
+                <div id="imagen-text"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let recetaGenerada = "";  // Variable para almacenar la receta generada
+    
+        // Manejar la generación de la receta
+        document.getElementById("generar-receta-btn").addEventListener("click", async () => {
+            // Obtener el mensaje completo desde los mensajes flash
+            const mensajeFlash = "{{ get_flashed_messages(category_filter='success')[0] }}";
+    
+            if (!mensajeFlash) {
+                alert("Por favor, realiza primero la predicción de precios.");
+                return;
+            }
+    
+            // Realizar la solicitud POST al backend para generar la receta con el mensaje completo
+            const response = await fetch('http://localhost:5009/receta', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mensaje: mensajeFlash }) // Aquí pasamos el mensaje completo al backend
+            });
+    
+            const data = await response.json();
+    
+            if (data.receta) {
+                // Convertir la receta de Markdown a HTML usando showdown.js
+                const converter = new showdown.Converter();
+                const recetaHtml = converter.makeHtml(data.receta);
+    
+                // Mostrar la receta convertida
+                document.getElementById("receta-text").innerHTML = recetaHtml;
+                document.getElementById("receta-result").style.display = "block";
+    
+                // Guardar la receta generada
+                recetaGenerada = data.receta;
+    
+                // Ocultar el mensaje de advertencia si ya se generó la receta
+                document.getElementById("mensaje-advertencia").style.display = "none";
+            } else {
+                alert("Error al generar la receta.");
+            }
+        });
+    
+        // Función para generar la imagen con el prompt
+        document.getElementById("generar-imagen-btn").addEventListener("click", async () => {
+            if (!recetaGenerada) {
+                // Si no se ha generado la receta, mostrar el mensaje de advertencia
+                document.getElementById("mensaje-advertencia").style.display = "block";
+                return;
+            }
+    
+            // Crear el prompt que deseas pasar al backend
+            const prompt = `Haz un emplatado de "${recetaGenerada}"`;
+    
+            // Realizar la solicitud POST al backend en el puerto 5010 para generar la imagen con el prompt
+            const response = await fetch('http://localhost:5010/generate-image', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `prompt=${encodeURIComponent(prompt)}`  // Usamos la receta en el prompt
+            });
+    
+            const data = await response.json();
+    
+            if (data.image_url) {
+                // Mostrar la imagen generada
+                const imageUrl = data.image_url;
+                document.getElementById("imagen-text").innerHTML = `<img src="${imageUrl}" alt="Imagen generada" class="img-fluid">`;
+                document.getElementById("imagen-generada").style.display = "block";  // Mostrar el div de la imagen
+            } else {
+                alert("Error al generar la imagen.");
+            }
+        });
+    </script>
+    
+
+
+    <script src="https://cdn.jsdelivr.net/npm/showdown@1.9.1/dist/showdown.min.js"></script>
+
+</body>
+
+</html>

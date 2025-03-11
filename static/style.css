@@ -1,0 +1,134 @@
+/* Estilos generales */
+body {
+    background-color: #f8f9fa; /* Color suave de fondo */
+    font-family: 'Arial', sans-serif; /* Fuente moderna y legible */
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Fondo del contenedor principal */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Estilos para las tarjetas */
+.card {
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra sutil para darle profundidad */
+    background-color: #ffffff;
+    overflow: hidden; /* Para que las esquinas redondeadas no se vean afectadas por contenido */
+    transition: transform 0.3s ease-in-out; /* Animación suave */
+}
+
+.card:hover {
+    transform: translateY(-10px); /* Elevar la tarjeta al pasar el ratón */
+}
+
+/* Títulos */
+h2 {
+    font-weight: bold;
+    font-size: 2.5rem; /* Aumentamos el tamaño para hacerlo más llamativo */
+    color: #343a40; /* Color gris oscuro para el texto */
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Subtítulos */
+h3 {
+    font-size: 1.8rem;
+    color: #007bff; /* Color llamativo para los subtítulos */
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Botones */
+.btn {
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 12px 30px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.btn-success {
+    background-color: #28a745;
+    border: none;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+}
+
+/* Mensajes de advertencia */
+.text-danger {
+    color: #dc3545;
+    font-size: 1.1rem;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Imágenes generadas */
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+/* Estilo del contenedor de la receta y la imagen */
+#receta-result,
+#imagen-generada {
+    display: none;
+    margin-top: 30px;
+}
+
+/* Animación para mostrar los resultados */
+.fadeIn {
+    animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Contenedor para los botones en una fila */
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+/* Centrar la imagen generada */
+#imagen-generada {
+    display: none;
+    margin-top: 30px;
+    text-align: center; /* Centrar el contenido dentro del contenedor */
+}
+
+#imagen-generada img {
+    display: inline-block; /* Asegura que la imagen no ocupe toda la línea */
+    max-width: 80%; /* Ajusta el tamaño de la imagen (puedes cambiarlo si es necesario) */
+    height: auto;
+    border-radius: 10px;
+}

@@ -1,0 +1,13 @@
+flask 
+joblib 
+tensorflow 
+scikit-learn 
+numpy 
+pandas
+google-generativeai
+flask-session 
+markdown 
+requests
+matplotlib
+flask-cors
+
